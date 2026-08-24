@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
 <meta name="theme-color" content="#751430">
-<title>Stock GM · Grupo Mundo</title>
+<title>App GM · Grupo Mundo</title>
 <script>if(window.innerWidth>1024&&(navigator.maxTouchPoints||0)===0){location.replace('escritorio.html');}</script>
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Stock GM">
-<link rel="apple-touch-icon" href="icon-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<meta name="apple-mobile-web-app-title" content="App GM">
+<link rel="apple-touch-icon" href="icon-gm-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-gm-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -144,7 +144,7 @@ header{background:var(--burdeos);color:#f5e9dd;padding:9px 14px;
 <body>
 <header>
  <div class="brand"><span class="b1">GRUPO MUNDO</span><span class="b2">INTERNATIONAL IMPORT</span></div>
- <div class="hmeta"><div class="ht">Stock GM</div><div class="hd" id="hd">Actualizado</div></div>
+ <div class="hmeta"><div class="ht">App GM</div><div class="hd" id="hd">Actualizado</div></div>
 </header>
 
 <div class="app">
@@ -522,7 +522,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catc
  function proforma(){
   const d=new Date();
   const f=d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
-  let t='🛒 *PEDIDO / PROFORMA*\n*Stock GM — App*\nFecha: '+f+'\n——————————\n';
+  let t='🛒 *PEDIDO / PROFORMA*\n*App GM · Grupo Mundo*\nFecha: '+f+'\n——————————\n';
   keys().forEach(function(k,i){ const it=cart[k];
    t+=(i+1)+') *'+it.q+' x* '+k+'\n     '+it.n+(it.c?' · '+it.c:'')+'\n'; });
   t+='——————————\nTotal: '+keys().length+' producto(s) · '+count()+' bulto(s)\n';
