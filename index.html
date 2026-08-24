@@ -433,6 +433,130 @@ function _prefetch(i){ if(i>=1&&i<=100){ const im=new Image(); im.src=PAGES[i-1]
 (function(){ const _rp=renderPage; renderPage=function(){ _rp(); _prefetch(page+1); _prefetch(page-1); }; })();
 window.addEventListener('load',()=>{ setTimeout(()=>{ PAGES.forEach((u,i)=>setTimeout(()=>{ fetch(u).catch(()=>{}); }, i*400)); }, 5000); });
 if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+
+/* ===== CARRITO DE PEDIDOS + WHATSAPP · Grupo Mundo ===== */
+(function(){
+ const WA_VENTAS='5491137833045';
+ const LSK='gm_carrito', LSN='gm_carrito_nota';
+ let cart={}; try{ cart=JSON.parse(localStorage.getItem(LSK)||'{}')||{}; }catch(e){ cart={}; }
+ const $=function(id){ return document.getElementById(id); };
+ const st=document.createElement('style');
+ st.textContent=`
+ .cartadd{flex:0 0 auto;width:34px;height:34px;margin-left:8px;border:none;border-radius:50%;
+  background:var(--burdeos);color:#f5e9dd;font-size:19px;line-height:1;cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.18);align-self:center}
+ .cartadd:active{transform:scale(.92)}
+ #cartFab{position:fixed;right:14px;bottom:84px;z-index:9998;width:58px;height:58px;border:none;
+  border-radius:50%;background:var(--burdeos);color:#fff;font-size:24px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+ #cartFab span{position:absolute;top:-4px;right:-4px;background:var(--verde);color:#fff;border-radius:10px;
+  min-width:20px;height:20px;font-size:12px;font-weight:700;display:none;align-items:center;justify-content:center;padding:0 5px}
+ #cartFab.has span{display:flex}
+ #cartWrap{position:fixed;inset:0;background:rgba(43,36,32,.5);z-index:9999;display:none;align-items:flex-end;justify-content:center}
+ #cartWrap.on{display:flex}
+ #cartSheet{background:var(--papel);width:100%;max-width:560px;max-height:86vh;border-radius:18px 18px 0 0;
+  display:flex;flex-direction:column;box-shadow:0 -6px 30px rgba(0,0,0,.3)}
+ #cartSheet .ch{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+  border-bottom:1px solid var(--linea);font-size:18px;font-weight:700;color:var(--burdeos)}
+ #cartX{border:none;background:none;font-size:20px;cursor:pointer;color:var(--gris)}
+ #cartItems{overflow-y:auto;padding:6px 14px;flex:1;min-height:60px}
+ .cempty{color:var(--gris);text-align:center;padding:26px 10px;font-size:14px}
+ .citem{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px dashed var(--linea)}
+ .citem .cn{font-size:13.5px;font-weight:600}
+ .citem .ck{font-size:11.5px;color:var(--gris)}
+ .cq{display:flex;align-items:center;gap:6px}
+ .cq button{width:30px;height:30px;border-radius:8px;border:1px solid var(--linea);background:var(--crema);
+  font-size:16px;cursor:pointer;color:var(--tinta)}
+ .cq b{min-width:22px;text-align:center}
+ .cq .cx{background:var(--rojo-bg);color:var(--rojo);border-color:transparent}
+ #cartNota{margin:8px 14px;padding:9px 10px;border:1px solid var(--linea);border-radius:10px;
+  font-family:inherit;font-size:13px;resize:none;height:56px;background:var(--crema)}
+ #cartTot{padding:2px 16px;font-size:13.5px;color:var(--tinta)}
+ .cbtns{display:flex;gap:10px;padding:10px 14px 6px}
+ #cartClear{flex:0 0 auto;border:1px solid var(--linea);background:var(--crema);border-radius:12px;
+  padding:11px 14px;cursor:pointer;color:var(--gris);font-size:13px}
+ #cartSend{flex:1;border:none;background:var(--verde);color:#fff;border-radius:12px;padding:12px;
+  font-size:15px;font-weight:700;cursor:pointer;box-shadow:0 3px 10px rgba(63,125,78,.35)}
+ .cfoot{font-size:11px;color:var(--gris);text-align:center;padding:4px 14px 14px}
+ @media(min-width:700px){ #cartWrap{align-items:center} #cartSheet{border-radius:16px} }
+ `;
+ document.head.appendChild(st);
+ document.body.insertAdjacentHTML('beforeend',
+  '<button id="cartFab" title="Ver mi pedido">🛒<span id="cartCnt">0</span></button>'+
+  '<div id="cartWrap"><div id="cartSheet">'+
+  '<div class="ch"><span>🛒 Mi pedido</span><button id="cartX">✕</button></div>'+
+  '<div id="cartItems"></div>'+
+  '<textarea id="cartNota" placeholder="Comentarios para ventas (sucursal, entrega, aclaraciones)…"></textarea>'+
+  '<div id="cartTot"></div>'+
+  '<div class="cbtns"><button id="cartClear">Vaciar</button><button id="cartSend">📲 Enviar pedido por WhatsApp</button></div>'+
+  '<div class="cfoot">Al enviar se abre WhatsApp con la proforma dirigida a Ventas Grupo Mundo: la revisás y tocás enviar.</div>'+
+  '</div></div>');
+ try{ $('cartNota').value=localStorage.getItem(LSN)||''; }catch(e){}
+ function save(){ try{ localStorage.setItem(LSK,JSON.stringify(cart)); }catch(e){} }
+ function keys(){ return Object.keys(cart); }
+ function count(){ let n=0; keys().forEach(function(k){ n+=cart[k].q; }); return n; }
+ function updFab(){ $('cartCnt').textContent=count(); $('cartFab').classList.toggle('has',count()>0); }
+ function stockOf(sku){ try{ const c=classify(sku); return (c&&c.n!=null)?c.n:null; }catch(e){ return null; } }
+ function add(sku,nom,col){
+  const it=cart[sku]||{q:0,n:nom,c:col}; it.q+=1;
+  const s=stockOf(sku);
+  if(s!=null&&s>0&&it.q>s){ it.q=s; toast('Máximo con stock: '+s); }
+  else if(s===0){ toast('Ojo: sin stock — va como consulta'); }
+  else { toast('Agregado ✓ ('+it.q+')'); }
+  cart[sku]=it; save(); updFab(); renderCart();
+ }
+ function setQ(sku,q){ if(!cart[sku])return; q=Math.max(0,q|0);
+  const s=stockOf(sku); if(s!=null&&s>0&&q>s){ q=s; toast('Máximo con stock: '+s); }
+  if(q<=0){ delete cart[sku]; } else { cart[sku].q=q; }
+  save(); updFab(); renderCart(); }
+ function renderCart(){
+  const ks=keys(), box=$('cartItems');
+  if(!ks.length){ box.innerHTML='<div class="cempty">Todavía no agregaste productos.<br>Usá el botón <b>＋</b> de cada artículo.</div>'; }
+  else{ box.innerHTML=ks.map(function(k){ const it=cart[k]; const s=stockOf(k);
+   return '<div class="citem"><div class="ci"><div class="cn">'+it.n+(it.c?' · '+it.c:'')+'</div>'+
+    '<div class="ck">'+k+(s!=null?' · stock: '+s:'')+'</div></div>'+
+    '<div class="cq"><button data-cq="-1" data-k="'+k+'">−</button><b>'+it.q+'</b>'+
+    '<button data-cq="1" data-k="'+k+'">＋</button><button class="cx" data-cx="'+k+'">✕</button></div></div>'; }).join(''); }
+  $('cartTot').innerHTML= ks.length? '<b>'+ks.length+'</b> producto(s) · <b>'+count()+'</b> bulto(s)':'';
+ }
+ function proforma(){
+  const d=new Date();
+  const f=d.toLocaleDateString('es-AR')+' '+d.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  let t='🛒 *PEDIDO / PROFORMA*\n*Stock GM — App*\nFecha: '+f+'\n——————————\n';
+  keys().forEach(function(k,i){ const it=cart[k];
+   t+=(i+1)+') *'+it.q+' x* '+k+'\n     '+it.n+(it.c?' · '+it.c:'')+'\n'; });
+  t+='——————————\nTotal: '+keys().length+' producto(s) · '+count()+' bulto(s)\n';
+  const n=$('cartNota').value.trim(); if(n){ t+='📝 '+n+'\n'; }
+  t+='_Enviado desde la app de stock_';
+  return t;
+ }
+ document.addEventListener('click',function(e){
+  const b=e.target.closest? e.target.closest('.cartadd'):null;
+  if(b){ e.preventDefault(); e.stopPropagation();
+   add(b.getAttribute('data-sku'), decodeURIComponent(b.getAttribute('data-n')||''), decodeURIComponent(b.getAttribute('data-c')||'')); }
+ }, true);
+ $('cartFab').onclick=function(){ renderCart(); $('cartWrap').classList.add('on'); };
+ $('cartX').onclick=function(){ $('cartWrap').classList.remove('on'); };
+ $('cartWrap').addEventListener('click',function(e){ if(e.target.id==='cartWrap'){ $('cartWrap').classList.remove('on'); } });
+ $('cartItems').addEventListener('click',function(e){
+  const q=e.target.closest('[data-cq]'); if(q){ const k=q.getAttribute('data-k'); setQ(k, cart[k].q + parseInt(q.getAttribute('data-cq'),10)); return; }
+  const x=e.target.closest('[data-cx]'); if(x){ setQ(x.getAttribute('data-cx'),0); } });
+ $('cartNota').addEventListener('input',function(e){ try{ localStorage.setItem(LSN,e.target.value); }catch(err){} });
+ $('cartClear').onclick=function(){ cart={}; save(); updFab(); renderCart(); toast('Pedido vaciado'); };
+ $('cartSend').onclick=function(){
+  if(!keys().length){ toast('El pedido está vacío'); return; }
+  const url='https://wa.me/'+WA_VENTAS+'?text='+encodeURIComponent(proforma());
+  window.open(url,'_blank'); toast('Abriendo WhatsApp…'); };
+ const _row=rowHTML;
+ rowHTML=function(p,x){ let h=_row(p,x);
+  const btn='<button class="cartadd" title="Agregar al pedido" data-sku="'+p.sku+'" data-n="'+encodeURIComponent(p.nombre)+'" data-c="'+encodeURIComponent(p.color||'')+'">＋</button>';
+  const i=h.lastIndexOf('</div>');
+  return h.slice(0,i)+btn+h.slice(i); };
+ updFab();
+ try{ renderPage(); }catch(e){}
+ try{ renderSearch(); }catch(e){}
+})();
+
 </script>
 </body>
 </html>
