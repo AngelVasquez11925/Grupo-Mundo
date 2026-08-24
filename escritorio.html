@@ -542,7 +542,7 @@ if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catc
    t+=(i+1)+') *'+it.q+' x* '+k+'\n     '+it.n+(it.c?' · '+it.c:'')+'\n'; });
   t+='——————————\nTotal: '+keys().length+' producto(s) · '+count()+' bulto(s)\n';
   const n=$('cartNota').value.trim(); if(n){ t+='📝 '+n+'\n'; }
-  t+='_Enviado desde la app de stock_';
+  t+='_Enviado desde la App de GM_';
   return t;
  }
  document.addEventListener('click',function(e){
