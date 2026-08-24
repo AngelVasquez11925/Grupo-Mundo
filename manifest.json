@@ -1,6 +1,6 @@
 {
-  "name": "Stock GM · Grupo Mundo",
-  "short_name": "Stock GM",
+  "name": "App GM · Grupo Mundo",
+  "short_name": "App GM",
   "description": "Catálogo digital y stock en vivo · Grupo Mundo",
   "lang": "es-AR",
   "start_url": "./index.html",
@@ -10,7 +10,17 @@
   "background_color": "#751430",
   "theme_color": "#751430",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-gm-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-gm-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
