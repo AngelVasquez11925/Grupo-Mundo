@@ -3,7 +3,7 @@
    - stock.csv NUNCA se cachea => el stock siempre se baja fresco de Netlify.
    IMPORTANTE: si algún día cambiás el catálogo o las fotos, subí el número de
    versión (fontenla-v1 -> fontenla-v2) para que los celulares tomen el cambio. */
-const CACHE = 'gm-v7';
+const CACHE = 'gm-v8';
 const SHELL = ['./', './index.html', './escritorio.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
