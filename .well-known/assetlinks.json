@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.elmundodelmueble.appgm",
+      "sha256_cert_fingerprints": [
+        "89:8C:97:0E:71:63:C6:64:99:8A:88:7B:56:CC:ED:50:C9:4E:DA:CE:C5:68:51:1A:29:44:46:75:C6:F9:C5:27"
+      ]
+    }
+  }
+]
