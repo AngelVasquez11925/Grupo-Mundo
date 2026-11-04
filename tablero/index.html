@@ -67,13 +67,15 @@ input:focus{outline:none;border-color:#d6187c}
       if(!r.ok) throw new Error('http '+r.status);
       pack=await r.json();
     }catch(x){ $('m').textContent='No se pudo descargar el tablero. Revisá la conexión y volvé a abrir la app.'; return; }
-    var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+    var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true||/TableroGM-APK/.test(navigator.userAgent);
     var k=getKey();
     if(k && location.search.indexOf('instalar')<0){ try{ mostrar(await abrir(k)); return; }catch(x){} }
     if(!standalone){
-      $('m').innerHTML='Para tenerla como app: tocá <b>Instalar app en el celular</b>.<br>Si no aparece el botón: menú <b>⋮</b> → <b>Abrir en Chrome</b> y después <b>⋮ → Instalar aplicación</b>.';
+      $('m').innerHTML='Para tenerla como app en el celular: tocá <b>Descargar app Android</b> y abrí el archivo descargado.';
+      var dl=document.createElement('a');dl.className='b';dl.href='TableroGM.apk';dl.setAttribute('download','TableroGM.apk');dl.textContent='Descargar app Android';dl.style.textDecoration='none';dl.style.boxSizing='border-box';
+      $('inst').insertAdjacentElement('beforebegin',dl);
       $('inst').style.display=ev?'block':'none';
-      var ab=document.createElement('button');ab.className='b';ab.type='button';ab.textContent='Ver el tablero sin instalar';
+      var ab=document.createElement('button');ab.className='b s';ab.type='button';ab.textContent='Ver el tablero sin instalar';
       ab.addEventListener('click',async function(){ if(k){ try{ mostrar(await abrir(k)); return; }catch(x){} } ab.remove(); pedir(); });
       $('inst').insertAdjacentElement('afterend',ab);
       return;
