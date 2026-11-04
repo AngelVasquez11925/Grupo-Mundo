@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+html,body{margin:0;height:100%;background:#fff;color:#0f1722;font-family:"Segoe UI",Roboto,Arial,sans-serif}
+.w{min-height:100%;display:grid;place-items:center;text-align:center;padding:24px;box-sizing:border-box}
+img{width:96px;height:96px;border-radius:22px;box-shadow:0 6px 20px rgba(214,24,124,.25)}
+h1{font-size:20px;margin:16px 0 6px}
+p{color:#5e6b7d;font-size:14px;margin:0 0 18px}
+a.b{display:inline-block;background:#d6187c;color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="w"><div>
+<img src="icon-192.png" alt="">
+<h1>Tablero de Control</h1>
+<p id="m">Abriendo el tablero…</p>
+<a class="b" id="go" href="https://claude.ai/artifact/TsEGeNnxMP9jtp5e8BnBs8">Abrir tablero</a>
+</div></div>
+<script>
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+var installed=window.matchMedia('(display-mode: standalone)').matches;
+if(installed){setTimeout(function(){location.href=document.getElementById('go').href;},300);}
+else{document.getElementById('m').textContent='Para instalarlo: menú ⋮ de Chrome → "Agregar a pantalla de inicio" / "Instalar aplicación".';}
+</script>
+</body>
+</html>
