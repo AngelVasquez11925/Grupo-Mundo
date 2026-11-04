@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tablero</title>
+<title>Tablero GM</title>
 <meta name="theme-color" content="#ffffff">
 <meta name="robots" content="noindex,nofollow">
 <link rel="manifest" href="manifest.json">
@@ -12,24 +12,30 @@
 <style>
 html,body{margin:0;height:100%;background:#fff;color:#0f1722;font-family:"Segoe UI",Roboto,Arial,sans-serif}
 .w{min-height:100%;display:grid;place-items:center;text-align:center;padding:24px;box-sizing:border-box}
-img{width:96px;height:96px;border-radius:22px;box-shadow:0 6px 20px rgba(214,24,124,.25)}
-h1{font-size:20px;margin:16px 0 6px}
-p{color:#5e6b7d;font-size:14px;margin:0 0 18px}
-a.b{display:inline-block;background:#d6187c;color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:10px}
+img{width:110px;height:110px;border-radius:26px;box-shadow:0 6px 20px rgba(214,24,124,.25)}
+h1{font-size:22px;margin:18px 0 8px}
+p{color:#5e6b7d;font-size:15px;margin:0 0 20px;line-height:1.4}
+.b{display:block;width:260px;margin:0 auto 12px;border:0;background:#d6187c;color:#fff;text-decoration:none;font:600 17px "Segoe UI",Roboto,Arial,sans-serif;padding:15px 22px;border-radius:12px;cursor:pointer}
+.b.s{background:#fff;color:#d6187c;border:2px solid #d6187c}
+#inst{display:none}
 </style>
 </head>
 <body>
 <div class="w"><div>
 <img src="icon-192.png" alt="">
-<h1>Tablero de Control</h1>
-<p id="m">Abriendo el tablero…</p>
-<a class="b" id="go" href="https://claude.ai/artifact/TsEGeNnxMP9jtp5e8BnBs8">Abrir tablero</a>
+<h1>Tablero GM</h1>
+<p id="m">Tocá <b>Instalar app</b> y aceptá.<br>Te queda el ícono magenta en el celular.</p>
+<button class="b" id="inst" type="button">Instalar app</button>
+<a class="b s" id="go" href="https://claude.ai/artifact/TsEGeNnxMP9jtp5e8BnBs8">Abrir tablero</a>
 </div></div>
 <script>
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
-var installed=window.matchMedia('(display-mode: standalone)').matches;
-if(installed){setTimeout(function(){location.href=document.getElementById('go').href;},300);}
-else{document.getElementById('m').textContent='Para instalarlo: menú ⋮ de Chrome → "Agregar a pantalla de inicio" / "Instalar aplicación".';}
+var go=document.getElementById('go').href, ib=document.getElementById('inst'), msg=document.getElementById('m'), ev=null;
+if(window.matchMedia('(display-mode: standalone)').matches){ location.replace(go); }
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;ib.style.display='block';});
+ib.addEventListener('click',function(){ if(!ev)return; ev.prompt(); ev.userChoice.then(function(r){ if(r.outcome==='accepted'){ib.style.display='none';msg.innerHTML='Listo: buscá <b>Tablero GM</b> en tus apps.';} ev=null; }); });
+window.addEventListener('appinstalled',function(){ib.style.display='none';msg.innerHTML='Listo: buscá <b>Tablero GM</b> en tus apps.';});
+setTimeout(function(){ if(!ev && !window.matchMedia('(display-mode: standalone)').matches){ msg.innerHTML='Si no aparece el botón <b>Instalar app</b>: menú <b>⋮</b> de Chrome → <b>Instalar aplicación</b>.'; } },2500);
 </script>
 </body>
 </html>
