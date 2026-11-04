@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablero GM</title>
+<meta name="theme-color" content="#ffffff">
+<meta name="robots" content="noindex,nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="https://angelvasquez11925.github.io/Grupo-Mundo/tablero/favicon.png">
+<link rel="apple-touch-icon" href="https://angelvasquez11925.github.io/Grupo-Mundo/tablero/icon-180.png">
+<style>
+html,body{margin:0;height:100%;background:#fff;color:#0f1722;font-family:"Segoe UI",Roboto,Arial,sans-serif}
+.w{min-height:100%;display:grid;place-items:center;text-align:center;padding:24px;box-sizing:border-box}
+img{width:104px;height:104px;border-radius:24px;box-shadow:0 6px 20px rgba(214,24,124,.25)}
+h1{font-size:22px;margin:16px 0 6px}
+p{color:#5e6b7d;font-size:15px;margin:0 0 16px;line-height:1.4}
+input{display:block;width:260px;margin:0 auto 12px;padding:13px 14px;font-size:16px;border:1.5px solid #d6dbe3;border-radius:10px;box-sizing:border-box}
+input:focus{outline:none;border-color:#d6187c}
+.b{display:block;width:260px;margin:0 auto 10px;border:0;background:#d6187c;color:#fff;font:600 17px "Segoe UI",Roboto,Arial,sans-serif;padding:14px 20px;border-radius:12px;cursor:pointer}
+.b.s{background:#fff;color:#d6187c;border:2px solid #d6187c}
+.e{color:#d9364a;font-size:14px;min-height:18px;margin:4px 0 8px}
+#inst,#form{display:none}
+</style>
+</head>
+<body>
+<div class="w"><div>
+<img src="https://angelvasquez11925.github.io/Grupo-Mundo/tablero/icon-192.png" alt="">
+<h1>Tablero GM</h1>
+<p id="m">Cargando…</p>
+<form id="form" autocomplete="off">
+  <input id="k" type="password" placeholder="Clave del tablero" aria-label="Clave del tablero" autocapitalize="none" autocorrect="off" spellcheck="false">
+  <div class="e" id="err"></div>
+  <button class="b" type="submit">Entrar</button>
+</form>
+<button class="b s" id="inst" type="button">Instalar app en el celular</button>
+</div></div>
+<script>
+(function(){
+  "use strict";
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}
+  var $=function(i){return document.getElementById(i);}, ev=null;
+  window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();ev=e;$('inst').style.display='block';});
+  $('inst').addEventListener('click',function(){if(!ev)return;ev.prompt();ev.userChoice.then(function(){ev=null;$('inst').style.display='none';});});
+  function b64(s){var r=atob(s),a=new Uint8Array(r.length);for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i);return a;}
+  function getKey(){try{return localStorage.getItem('tablero-clave')||'';}catch(e){return '';}}
+  function setKey(v){try{localStorage.setItem('tablero-clave',v);}catch(e){}}
+  var pack=null;
+  async function abrir(clave){
+    var enc=new TextEncoder();
+    var base=await crypto.subtle.importKey('raw',enc.encode(clave),'PBKDF2',false,['deriveKey']);
+    var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(pack.salt),iterations:pack.iter,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['decrypt']);
+    var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(pack.iv)},key,b64(pack.ct));
+    return new TextDecoder().decode(pt);
+  }
+  function mostrar(html){ html=html.replace(/<head>/i,'<head><link rel="manifest" href="manifest.json"><link rel="icon" href="https://angelvasquez11925.github.io/Grupo-Mundo/tablero/favicon.png"><link rel="apple-touch-icon" href="https://angelvasquez11925.github.io/Grupo-Mundo/tablero/icon-180.png">'); document.open(); document.write(html); document.close(); }
+  function pedir(msg){ $('m').textContent=msg||'Ingresá la clave una sola vez; el celular la recuerda.'; $('form').style.display='block'; setTimeout(function(){$('k').focus();},100); }
+  $('form').addEventListener('submit',async function(e){
+    e.preventDefault(); var v=$('k').value.trim().toLowerCase(); if(!v)return;
+    $('err').textContent=''; $('m').textContent='Abriendo…';
+    try{ var html=await abrir(v); setKey(v); mostrar(html); }
+    catch(x){ $('m').textContent='Ingresá la clave del tablero.'; $('err').textContent='Clave incorrecta. Revisala y probá de nuevo.'; }
+  });
+  (async function(){
+    try{
+      var r=await fetch('https://angelvasquez11925.github.io/Grupo-Mundo/tablero/tablero.enc.json?t='+Date.now(),{cache:'no-store'});
+      if(!r.ok) throw new Error('http '+r.status);
+      pack=await r.json();
+    }catch(x){ $('m').textContent='No se pudo descargar el tablero. Revisá la conexión y volvé a abrir la app.'; return; }
+    var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+    var k=getKey();
+    if(k && location.search.indexOf('instalar')<0){ try{ mostrar(await abrir(k)); return; }catch(x){} }
+    if(!standalone){
+      $('m').innerHTML='Para tenerla como app: tocá <b>Instalar app en el celular</b>.<br>Si no aparece el botón: menú <b>⋮</b> → <b>Abrir en Chrome</b> y después <b>⋮ → Instalar aplicación</b>.';
+      $('inst').style.display=ev?'block':'none';
+      var ab=document.createElement('button');ab.className='b';ab.type='button';ab.textContent='Ver el tablero sin instalar';
+      ab.addEventListener('click',async function(){ if(k){ try{ mostrar(await abrir(k)); return; }catch(x){} } ab.remove(); pedir(); });
+      $('inst').insertAdjacentElement('afterend',ab);
+      return;
+    }
+    if(k){ try{ mostrar(await abrir(k)); return; }catch(x){ pedir('La clave cambió: ingresala de nuevo.'); return; } }
+    pedir();
+  })();
+})();
+</script>
+</body>
+</html>
