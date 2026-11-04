@@ -69,6 +69,7 @@ input:focus{outline:none;border-color:#d6187c}
     }catch(x){ $('m').textContent='No se pudo descargar el tablero. Revisá la conexión y volvé a abrir la app.'; return; }
     var standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
     var k=getKey();
+    if(k && location.search.indexOf('instalar')<0){ try{ mostrar(await abrir(k)); return; }catch(x){} }
     if(!standalone){
       $('m').innerHTML='Para tenerla como app: tocá <b>Instalar app en el celular</b>.<br>Si no aparece el botón: menú <b>⋮</b> → <b>Abrir en Chrome</b> y después <b>⋮ → Instalar aplicación</b>.';
       $('inst').style.display=ev?'block':'none';
